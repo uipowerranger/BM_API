@@ -98,22 +98,46 @@ exports.register = [
             if (err) {
               return apiResponse.ErrorResponse(res, err);
             }
-            let userData = {
-              _id: user._id,
-              first_name: user.first_name,
-              last_name: user.last_name,
-              email_id: user.email_id,
-              phone_number: user.phone_number,
-              address: user.address,
-              city: user.city,
-              state: user.state,
-              post_code: user.post_code,
-            };
-            return apiResponse.successResponseWithData(
-              res,
-              "Registration Success.",
-              userData
-            );
+            // Html email body
+            let link =
+              process.env.PAYMENT_URL +
+              "/#/verify-email?email=" +
+              user.email_id +
+              "&otp=" +
+              otp;
+            let html =
+              "<p>Please Verify your Account.</p><p>Click on the link to verify your email</p><p><a href='" +
+              link +
+              "'>Verify Email</a></p>";
+            // Send confirmation email
+            mailer
+              .send(
+                constants.confirmEmails.from,
+                user.email_id,
+                "Verify Account ",
+                html
+              )
+              .then(function () {
+                let userData = {
+                  _id: user._id,
+                  first_name: user.first_name,
+                  last_name: user.last_name,
+                  email_id: user.email_id,
+                  phone_number: user.phone_number,
+                  address: user.address,
+                  city: user.city,
+                  state: user.state,
+                  post_code: user.post_code,
+                };
+                return apiResponse.successResponseWithData(
+                  res,
+                  "Registration Success.",
+                  userData
+                );
+              })
+              .catch((err) => {
+                return apiResponse.ErrorResponse(res, "Error in sending mail");
+              });
           });
         });
       }
@@ -170,8 +194,8 @@ exports.UserUpdate = [
               //update Category.
               UserModel.findByIdAndUpdate(
                 req.params.id,
-                admin,
-                {},
+                ...rest,
+                { new: true },
                 function (err) {
                   if (err) {
                     return apiResponse.ErrorResponse(res, err);
@@ -320,65 +344,42 @@ exports.login = [
               function (err, same) {
                 if (same) {
                   //Check account confirmation.
-                  if (true) {
+                  if (user.isConfirmed) {
                     // Check User's account active or not.
                     if (user.status) {
                       let otp = utility.randomNumber(6);
-                      // Html email body
-                      let html =
-                        "<p>Please Login your Account.</p><p>OTP: " +
-                        otp +
-                        "</p>";
-                      // Send confirmation email
-                      mailer
-                        .send(
-                          constants.confirmEmails.from,
-                          req.body.email_id,
-                          "Login OTP ",
-                          html
-                        )
-                        .then(function () {
-                          UserModel.findOneAndUpdate(
-                            { email_id: req.body.email_id },
-                            {
-                              isConfirmed: 1,
-                              confirmOTP: otp,
-                            }
-                          ).catch((err) => {
-                            return apiResponse.ErrorResponse(res, err);
-                          });
-                          let userData = {
-                            _id: user._id,
-                            first_name: user.first_name,
-                            last_name: user.last_name,
-                            email_id: user.email_id,
-                            role: user.role,
-                            assign_state: user.assign_state,
-                          };
-                          //Prepare JWT token for authentication
-                          const jwtPayload = userData;
-                          const jwtData = {
-                            expiresIn: process.env.JWT_TIMEOUT_DURATION,
-                          };
-                          const secret = process.env.JWT_SECRET;
-                          //Generated JWT token with Payload and secret.
-                          userData.token = jwt.sign(
-                            jwtPayload,
-                            secret,
-                            jwtData
-                          );
-                          return apiResponse.successResponseWithData(
-                            res,
-                            "Login Success.",
-                            userData
-                          );
-                        });
+                      let userData = {
+                        _id: user._id,
+                        first_name: user.first_name,
+                        last_name: user.last_name,
+                        email_id: user.email_id,
+                        role: user.role,
+                        assign_state: user.assign_state,
+                      };
+                      //Prepare JWT token for authentication
+                      const jwtPayload = userData;
+                      const jwtData = {
+                        expiresIn: process.env.JWT_TIMEOUT_DURATION,
+                      };
+                      const secret = process.env.JWT_SECRET;
+                      //Generated JWT token with Payload and secret.
+                      userData.token = jwt.sign(jwtPayload, secret, jwtData);
+                      return apiResponse.successResponseWithData(
+                        res,
+                        "Login Success.",
+                        userData
+                      );
                     } else {
                       return apiResponse.unauthorizedResponse(
                         res,
                         "Account is not active. Please contact admin."
                       );
                     }
+                  } else {
+                    return apiResponse.ErrorResponse(
+                      res,
+                      "Email is not Confirmed."
+                    );
                   }
                 } else {
                   return apiResponse.unauthorizedResponse(
@@ -438,7 +439,7 @@ exports.verifyConfirm = [
         UserModel.findOne(query).then((user) => {
           if (user) {
             //Check already confirm or not.
-            if (true) {
+            if (!user.isConfirmed) {
               //Check account confirmation.
               if (user.confirmOTP == req.body.otp) {
                 //Update user as confirmed
@@ -529,14 +530,22 @@ exports.resendConfirmOtp = [
               // Generate otp
               let otp = utility.randomNumber(6);
               // Html email body
+              let link =
+                process.env.PAYMENT_URL +
+                "/#/verify-email?email=" +
+                user.email_id +
+                "&otp=" +
+                otp;
               let html =
-                "<p>Please Login your Account.</p><p>OTP: " + otp + "</p>";
+                "<p>Please Verify your Account.</p><p>Click on the link to verify your email</p><p><a href='" +
+                link +
+                "'>Verify Email</a></p>";
               // Send confirmation email
               mailer
                 .send(
                   constants.confirmEmails.from,
                   req.body.email_id,
-                  "Login OTP",
+                  "Verify Account",
                   html
                 )
                 .then(function () {
@@ -772,9 +781,12 @@ exports.resetMail = [
             let otp = utility.randomNumber(6);
             let url =
               process.env.PAYMENT_URL +
-              `/#/user/reset-pwd?email=${data.email_id}&otp=${otp}`;
+              `/#/reset-pwd?email=${data.email_id}&otp=${otp}`;
             // Html email body
-            let html = `<p>Reset Password.</p><p>Your OTP to reset password: ${otp}</p>`;
+            let html =
+              "<p>Click on the link to reset password</p><p><a href='" +
+              url +
+              "'>Reset Password</a></p>";
             // Send confirmation email
             mailer
               .send(

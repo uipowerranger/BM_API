@@ -6,7 +6,7 @@ var UserSchema = new mongoose.Schema(
     last_name: { type: String, required: true },
     email_id: { type: String, required: true },
     password: { type: String, required: true },
-    isConfirmed: { type: Boolean, required: true, default: 1 },
+    isConfirmed: { type: Boolean, required: true, default: 0 },
     is_active: { type: Boolean, required: true, default: 1 },
     confirmOTP: { type: String, required: false },
     otpTries: { type: Number, required: false, default: 0 },
