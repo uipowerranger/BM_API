@@ -131,7 +131,7 @@ exports.register = [
                 };
                 return apiResponse.successResponseWithData(
                   res,
-                  "Registration Success.",
+                  "Registration Success. Please Check your Registered email",
                   userData
                 );
               })
