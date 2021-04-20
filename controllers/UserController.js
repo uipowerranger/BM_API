@@ -784,7 +784,7 @@ exports.resetMail = [
               `/#/reset-pwd?email=${data.email_id}&otp=${otp}`;
             // Html email body
             let html =
-              "<h4>${otp} is your OTP please use it to reset password</h4>" +
+              `<h4>${otp} is your OTP please use it to reset password</h4>` +
               "<p>Click on the link to reset password</p><p><a href='" +
               url +
               "'>Reset Password</a></p>";
