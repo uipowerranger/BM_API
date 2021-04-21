@@ -113,14 +113,14 @@ exports.create = [
               Phone: req.body.phone_number,
             },
             Payment: {
-              TotalAmount: req.body.total_amount,
+              TotalAmount: Number(req.body.total_amount),
               InvoiceNumber: order._id,
               InvoiceDescription: "Birlamart Purchase",
               InvoiceReference: "",
               CurrencyCode: "AUD",
             },
           };
-          ///console.log(paymentData);
+          //console.log(paymentData);
           eway
             .payment(paymentData)
             .then(function (response) {
@@ -137,7 +137,7 @@ exports.create = [
                   orderData
                 );
               } else {
-                return apiResponse.ErrorResponse(res, response.getErrors());
+                return apiResponse.ErrorResponse(res, response);
               }
             })
             .catch(function (reason) {
