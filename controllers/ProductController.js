@@ -290,6 +290,8 @@ exports.ProductListSearchByState = [
               description: 1,
               homepage_filter: 1,
               createdAt: 1,
+              "category._id": 1,
+              "category.category_name": 1,
             },
           },
         ]).then((products) => {
