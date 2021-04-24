@@ -57,7 +57,7 @@ exports.create = [
           };
           return apiResponse.successResponseWithData(
             res,
-            "Order Success.",
+            "Enquiry Saved Successfully.",
             orderData
           );
         });
