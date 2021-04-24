@@ -57,7 +57,7 @@ exports.create = [
           };
           return apiResponse.successResponseWithData(
             res,
-            "Enquiry Saved Successfully.",
+            "We have registered your enquiry We will comeback to you soon.",
             orderData
           );
         });
