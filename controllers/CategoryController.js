@@ -13,6 +13,7 @@ function CategoryData(data) {
   this.post_code_details = data.post_code_details;
   this.createdAt = data.createdAt;
   this.image = data.image;
+  this.order_number = data.order_number;
 }
 
 /**
@@ -24,6 +25,7 @@ exports.CategoryList = [
   function (req, res) {
     try {
       CategoryModel.aggregate([
+        { $sort: { order_number: 1 } },
         {
           $lookup: {
             from: "states",
@@ -76,10 +78,17 @@ exports.CategoryList = [
  */
 exports.CategoryListByState = [
   function (req, res) {
+    console.log(req.params.state);
     try {
-      CategoryModel.find({
-        state_details: req.params.state,
-      }).then((categories) => {
+      CategoryModel.aggregate([
+        { $sort: { order_number: 1 } },
+        {
+          $match: {
+            status: { $ne: 3 },
+            state_details: mongoose.Types.ObjectId(req.params.state),
+          },
+        },
+      ]).then((categories) => {
         if (categories.length > 0) {
           return apiResponse.successResponseWithData(
             res,
@@ -116,6 +125,9 @@ exports.CategoryStore = [
     .trim()
     .escape(),
   body("state_details", "State must not be empty.").isLength({ min: 1 }).trim(),
+  body("order_number", "Order number must not be empty.")
+    .isLength({ min: 1 })
+    .trim(),
   body("post_code_details", "Post code must not be empty.")
     .isLength({ min: 1 })
     .trim(),
@@ -128,6 +140,7 @@ exports.CategoryStore = [
         state_details: req.body.state_details,
         post_code_details: req.body.post_code_details,
         image: req.body.image,
+        order_number: req.body.order_number,
       });
 
       if (!errors.isEmpty()) {
@@ -171,6 +184,9 @@ exports.CategoryUpdate = [
   body("category_name", "Name must not be empty.").isLength({ min: 1 }).trim(),
   body("status", "Status must not be empty.").isLength({ min: 1 }).trim(),
   body("state_details", "State must not be empty.").isLength({ min: 1 }).trim(),
+  body("order_number", "Order Number must not be empty")
+    .isLength({ min: 1 })
+    .trim(),
   body("post_code_details", "Post code must not be empty.")
     .isLength({ min: 1 })
     .trim(),
@@ -184,6 +200,7 @@ exports.CategoryUpdate = [
         post_code_details: req.body.post_code_details,
         status: req.body.status,
         image: req.body.image,
+        order_number: req.body.order_number,
         _id: req.params.id,
       });
 

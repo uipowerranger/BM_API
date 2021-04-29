@@ -16,6 +16,7 @@ var redeemRouter = require("./redeem");
 var stockRouter = require("./stock");
 var carouselRouter = require("./carousel");
 var unitsRouter = require("./units");
+var filterRouter = require("./filters");
 
 var app = express();
 
@@ -36,5 +37,6 @@ app.use("/redeem", redeemRouter);
 app.use("/stock", stockRouter);
 app.use("/carousel", carouselRouter);
 app.use("/units", unitsRouter);
+app.use("/filters", filterRouter);
 
 module.exports = app;

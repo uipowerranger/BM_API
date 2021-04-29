@@ -12,6 +12,7 @@ var CategorySchema = new Schema(
       required: true,
     },
     status: { type: Number, required: true, default: 1 },
+    order_number: { type: Number, required: true, default: 1 },
     image: { type: String, require: false, default: "" },
   },
   { timestamps: true }

@@ -2,6 +2,7 @@ const ProductModel = require("../models/ProductModel");
 const StockMoveModel = require("../models/StockMoveModel");
 const AllCategoryModel = require("../models/CategoryModel");
 const AllStateModel = require("../models/StateModel");
+const FilterModel = require("../models/FiltersModel");
 const { body, query, validationResult } = require("express-validator");
 const apiResponse = require("../helpers/apiResponse");
 const auth = require("../middlewares/jwt");
@@ -132,62 +133,19 @@ exports.ProductListByState = [
             stockmovements: 1,
           },
         },
-      ]).then((products) => {
+      ]).then(async (products) => {
         if (products.length > 0) {
-          let filterList = [
-            {
-              name: "",
+          let filters = await new Promise((resolve, reject) => {
+            FilterModel.find({ status: 1 })
+              .then((res) => resolve(res))
+              .catch((e) => reject([]));
+          });
+          let filterList = filters.map((p) => {
+            return {
+              name: p.filter_name,
               prod_list: [],
-            },
-            {
-              name: "None",
-              prod_list: [],
-            },
-            {
-              name: "Best Deal",
-              prod_list: [],
-            },
-            {
-              name: "Deal of the Day",
-              prod_list: [],
-            },
-            {
-              name: "Upto 60% off",
-              prod_list: [],
-            },
-            {
-              name: "Organic",
-              prod_list: [],
-            },
-            {
-              name: "Healthy Diet",
-              prod_list: [],
-            },
-            {
-              name: "Everyday essentials",
-              prod_list: [],
-            },
-            {
-              name: "Best deals in Oils",
-              prod_list: [],
-            },
-            {
-              name: "Hot Deal in Honey",
-              prod_list: [],
-            },
-            {
-              name: "Great offer in Dryfruits",
-              prod_list: [],
-            },
-            {
-              name: "Best Sellers in Beauty",
-              prod_list: [],
-            },
-            {
-              name: "Miscellaneous",
-              prod_list: [],
-            },
-          ];
+            };
+          });
           products.map((prod) => {
             let totalStock = 0;
             prod.stockmovements.map((st) => {
@@ -665,62 +623,19 @@ exports.AllProductList = [
             stockmovements: 1,
           },
         },
-      ]).then((products) => {
+      ]).then(async (products) => {
         if (products.length > 0) {
-          let filterList = [
-            {
-              name: "",
+          let filters = await new Promise((resolve, reject) => {
+            FilterModel.find({ status: 1 })
+              .then((res) => resolve(res))
+              .catch((e) => reject([]));
+          });
+          let filterList = filters.map((p) => {
+            return {
+              name: p.filter_name,
               prod_list: [],
-            },
-            {
-              name: "None",
-              prod_list: [],
-            },
-            {
-              name: "Best Deal",
-              prod_list: [],
-            },
-            {
-              name: "Deal of the Day",
-              prod_list: [],
-            },
-            {
-              name: "Upto 60% off",
-              prod_list: [],
-            },
-            {
-              name: "Organic",
-              prod_list: [],
-            },
-            {
-              name: "Healthy Diet",
-              prod_list: [],
-            },
-            {
-              name: "Everyday essentials",
-              prod_list: [],
-            },
-            {
-              name: "Best deals in Oils",
-              prod_list: [],
-            },
-            {
-              name: "Hot Deal in Honey",
-              prod_list: [],
-            },
-            {
-              name: "Great offer in Dryfruits",
-              prod_list: [],
-            },
-            {
-              name: "Best Sellers in Beauty",
-              prod_list: [],
-            },
-            {
-              name: "Miscellaneous",
-              prod_list: [],
-            },
-          ];
+            };
+          });
           products.map((prod) => {
             let totalStock = 0;
             prod.stockmovements.map((st) => {
