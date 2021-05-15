@@ -134,7 +134,10 @@ exports.PostcodeStore = [
     .trim()
     .escape()
     .custom((value, { req }) => {
-      return PostcodeModel.findOne({ post_code: value }).then((cat) => {
+      return PostcodeModel.findOne({
+        post_code: value,
+        status: { $ne: 3 },
+      }).then((cat) => {
         if (cat) {
           return Promise.reject("Postcode already exist.");
         }

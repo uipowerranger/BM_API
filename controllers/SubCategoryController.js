@@ -136,7 +136,10 @@ exports.CategoryStore = [
     .trim()
     .escape()
     .custom((value, { req }) => {
-      return CategoryModel.findOne({ sub_category_name: value }).then((cat) => {
+      return CategoryModel.findOne({
+        sub_category_name: value,
+        status: { $ne: 3 },
+      }).then((cat) => {
         if (cat) {
           return Promise.reject("Category already exist with this name.");
         }

@@ -28,11 +28,13 @@ exports.UnitStore = [
     .trim()
     .withMessage("Unit name must be specified.")
     .custom((value) => {
-      return UnitModel.findOne({ unit_name: value }).then((cat) => {
-        if (cat) {
-          return Promise.reject("Unit name already exists");
+      return UnitModel.findOne({ unit_name: value, status: { $ne: 3 } }).then(
+        (cat) => {
+          if (cat) {
+            return Promise.reject("Unit name already exists");
+          }
         }
-      });
+      );
     }),
   (req, res) => {
     try {

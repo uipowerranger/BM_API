@@ -38,6 +38,7 @@ var OrderSchema = new mongoose.Schema(
     order_completed: { type: Boolean, required: false, default: 0 },
     state_details: { type: Schema.ObjectId, ref: "states", required: true },
     redeempoints_used: { type: Number, required: false, default: 0 },
+    delivery_charges: { type: Number, required: false, default: 0 },
   },
   { timestamps: true }
 );
