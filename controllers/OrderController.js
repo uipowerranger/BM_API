@@ -119,6 +119,7 @@ exports.create = [
               InvoiceDescription: "Birlamart Purchase",
               InvoiceReference: "",
               CurrencyCode: "AUD",
+              DeliveryCharges: delivery_charges
             },
           };
           //console.log(paymentData);
@@ -423,7 +424,7 @@ exports.VerifyToken = [
                     OrderModel.updateOne(
                       { _id: response.get("Transactions[0].InvoiceNumber") },
                       { payment: 1 },
-                      function (err, data) {}
+                      function (err, data) { }
                     );
                     if (data.total_amount >= 100) {
                       let redeem = Math.ceil(data.total_amount / 100);
@@ -434,7 +435,7 @@ exports.VerifyToken = [
                         total_amount: data.total_amount,
                         redeem_points: redeem,
                       });
-                      redeemData.save((err, msg) => {});
+                      redeemData.save((err, msg) => { });
                     }
                     if (data.redeempoints_used > 0) {
                       let redeemDataUsed = new RedeemModel({
@@ -445,7 +446,7 @@ exports.VerifyToken = [
                         redeem_points: data.redeempoints_used,
                         status: 2,
                       });
-                      redeemDataUsed.save((err, msg) => {});
+                      redeemDataUsed.save((err, msg) => { });
                     }
                     data.items.map((it) => {
                       let stock = new StockMoveModel({
@@ -457,7 +458,7 @@ exports.VerifyToken = [
                         status: 1,
                         transactionType: "By Order",
                       });
-                      stock.save((err, msg) => {});
+                      stock.save((err, msg) => { });
                     });
                     let html = `<html lang="en">
 
@@ -481,6 +482,7 @@ exports.VerifyToken = [
                               <p>Order Date:<strong>${data.order_date}</strong></p>
                               <p>Total Items:<strong>${data.items.length}</strong></p>
                               <p>Total Price:<strong>${data.total_amount}</strong></p>
+                              <p>Delivery Charges:<strong>${data.delivery_charges}</strong></p>
                               <p>Bill Type: <strong>Visa/MasterCard/CreditCard/DebitCard</strong> </p>
                               <h4><u> Order Summary:</u></h4>`;
 
