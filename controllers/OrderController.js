@@ -488,7 +488,6 @@ exports.VerifyToken = [
                               <p>Order Date:<strong>${data.order_date}</strong></p>
                               <p>Total Items:<strong>${data.items.length}</strong></p>
                               <p>Total Price:<strong>${data.total_amount}</strong></p>
-                              <p>Delivery Charges:<strong>${data.delivery_charges}</strong></p>
                               <p>Bill Type: <strong>Visa/MasterCard/CreditCard/DebitCard</strong> </p>
                               <h4><u> Order Summary:</u></h4>`;
 
