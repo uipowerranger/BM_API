@@ -169,7 +169,6 @@ exports.UserUpdate = [
         ...rest,
         _id: req.params.id,
       });
-
       if (!errors.isEmpty()) {
         return apiResponse.validationErrorWithData(
           res,
@@ -194,7 +193,7 @@ exports.UserUpdate = [
               //update Category.
               UserModel.findByIdAndUpdate(
                 req.params.id,
-                ...rest,
+                { ...rest },
                 { new: true },
                 function (err) {
                   if (err) {
