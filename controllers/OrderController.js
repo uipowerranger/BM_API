@@ -14,6 +14,11 @@ const eway = require("../helpers/eway");
 const twilio = require("../helpers/twilio");
 const { constants } = require("../helpers/constants");
 var mongoose = require("mongoose");
+import { jsPDF } from "jspdf";
+
+// Default export is a4 paper, portrait, using millimeters for units
+const doc = new jsPDF();
+
 mongoose.set("useFindAndModify", false);
 
 /**
@@ -75,7 +80,6 @@ exports.create = [
   body("redeempoints_used", "User redeempoints_used is required")
     .exists()
     .isNumeric(),
-  body("delivery_charges", "Delivery charges is required").exists().isNumeric(),
   // Process request after validation and sanitization.
   (req, res) => {
     try {
@@ -96,6 +100,9 @@ exports.create = [
         });
         // Save order.
         order.save(function (err) {
+
+          doc.text("Hello world!", 10, 10);
+          doc.save("a4.pdf");
           if (err) {
             return apiResponse.ErrorResponse(res, err);
           }
@@ -119,7 +126,6 @@ exports.create = [
               InvoiceDescription: "Birlamart Purchase",
               InvoiceReference: "",
               CurrencyCode: "AUD",
-              DeliveryCharges: delivery_charges
             },
           };
           //console.log(paymentData);
