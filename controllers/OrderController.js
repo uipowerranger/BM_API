@@ -75,6 +75,7 @@ exports.create = [
   body("redeempoints_used", "User redeempoints_used is required")
     .exists()
     .isNumeric(),
+    body("delivery_charges", "Delivery charges is required").exists().isNumeric(),
   // Process request after validation and sanitization.
   (req, res) => {
     try {

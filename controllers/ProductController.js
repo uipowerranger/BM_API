@@ -159,11 +159,13 @@ exports.ProductListByState = [
             let i = filterList.findIndex(
               (f) => f.name === prod.homepage_filter
             );
-            let fIndex = i === -1 ? 0 : i;
-            filterList[fIndex].prod_list.push({
-              ...prod,
-              items_available: totalStock,
-            });
+            let fIndex = i;
+            if (fIndex !== -1) {
+              filterList[fIndex].prod_list.push({
+                ...prod,
+                items_available: totalStock,
+              });
+            }
             return {
               ...prod,
               items_available: totalStock,
@@ -1065,7 +1067,7 @@ exports.ProductStore = [
             status: 2,
             transactionType: "By Create",
           });
-          stock.save((err, msg) => {});
+          stock.save((err, msg) => { });
           return apiResponse.successResponseWithData(
             res,
             "Product add Success.",
