@@ -14,6 +14,11 @@ const eway = require("../helpers/eway");
 const twilio = require("../helpers/twilio");
 const { constants } = require("../helpers/constants");
 var mongoose = require("mongoose");
+import { jsPDF } from "jspdf";
+
+// Default export is a4 paper, portrait, using millimeters for units
+const doc = new jsPDF();
+
 mongoose.set("useFindAndModify", false);
 
 /**
@@ -96,6 +101,9 @@ exports.create = [
         });
         // Save order.
         order.save(function (err) {
+
+          doc.text("Hello world!", 10, 10);
+          doc.save("a4.pdf");
           if (err) {
             return apiResponse.ErrorResponse(res, err);
           }
@@ -423,7 +431,7 @@ exports.VerifyToken = [
                     OrderModel.updateOne(
                       { _id: response.get("Transactions[0].InvoiceNumber") },
                       { payment: 1 },
-                      function (err, data) {}
+                      function (err, data) { }
                     );
                     if (data.total_amount >= 100) {
                       let redeem = Math.ceil(data.total_amount / 100);
@@ -434,7 +442,7 @@ exports.VerifyToken = [
                         total_amount: data.total_amount,
                         redeem_points: redeem,
                       });
-                      redeemData.save((err, msg) => {});
+                      redeemData.save((err, msg) => { });
                     }
                     if (data.redeempoints_used > 0) {
                       let redeemDataUsed = new RedeemModel({
@@ -445,7 +453,7 @@ exports.VerifyToken = [
                         redeem_points: data.redeempoints_used,
                         status: 2,
                       });
-                      redeemDataUsed.save((err, msg) => {});
+                      redeemDataUsed.save((err, msg) => { });
                     }
                     data.items.map((it) => {
                       let stock = new StockMoveModel({
@@ -457,7 +465,7 @@ exports.VerifyToken = [
                         status: 1,
                         transactionType: "By Order",
                       });
-                      stock.save((err, msg) => {});
+                      stock.save((err, msg) => { });
                     });
                     let html = `<html lang="en">
 
@@ -489,7 +497,7 @@ exports.VerifyToken = [
                       `<table width="50%" border="2" style="margin:30px 10px;border-radius: 13px; border-spacing: 0; padding: 10px;">
                       <thead style=" background-color: #F1D4AF; border: 0;border-radius: 0;">
                           <tr>
-                              <th>Sl.No</th>
+                              <th>Sl.NO</th>
                               <th>Product Name</th>
                               <th>Quantity</th>
                               <th>Price</th>

@@ -33,7 +33,8 @@ exports.UnitStore = [
           if (cat) {
             return Promise.reject("Unit name already exists");
           }
-        })
+        }
+      );
     }),
   (req, res) => {
     try {
