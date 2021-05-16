@@ -496,7 +496,7 @@ exports.VerifyToken = [
                       `<table width="50%" border="2" style="margin:30px 10px;border-radius: 13px; border-spacing: 0; padding: 10px;">
                       <thead style=" background-color: #F1D4AF; border: 0;border-radius: 0;">
                           <tr>
-                              <th>Sl.No</th>
+                              <th>Sl.NO</th>
                               <th>Product Name</th>
                               <th>Quantity</th>
                               <th>Price</th>
