@@ -11,6 +11,7 @@ const jwt = require("jsonwebtoken");
 const auth = require("../middlewares/jwt");
 const mailer = require("../helpers/mailer");
 const eway = require("../helpers/eway");
+const ewaymobile = require("../helpers/eway-mobile");
 const twilio = require("../helpers/twilio");
 const { constants } = require("../helpers/constants");
 var mongoose = require("mongoose");
@@ -125,31 +126,59 @@ exports.create = [
             },
           };
           //console.log(paymentData);
-          eway
-            .payment(paymentData)
-            .then(function (response) {
-              if (response.getErrors().length == 0) {
-                var redirectURL = response.get("SharedPaymentUrl");
-                let orderData = {
-                  _id: order._id,
-                  createdAt: order.createdAt,
-                  redirectURL: redirectURL,
-                };
-                return apiResponse.successResponseWithData(
-                  res,
-                  "Order Success.",
-                  orderData
-                );
-              } else {
-                return apiResponse.ErrorResponse(res, response);
-              }
-            })
-            .catch(function (reason) {
-              reason.getErrors().forEach(function (error) {
-                console.log("Response Messages: " + (error, "en"));
+          if (!!req.body.isMobile) {
+            ewaymobile
+              .payment(paymentData)
+              .then(function (response) {
+                if (response.getErrors().length == 0) {
+                  var redirectURL = response.get("SharedPaymentUrl");
+                  let orderData = {
+                    _id: order._id,
+                    createdAt: order.createdAt,
+                    redirectURL: redirectURL,
+                  };
+                  return apiResponse.successResponseWithData(
+                    res,
+                    "Order Success.",
+                    orderData
+                  );
+                } else {
+                  return apiResponse.ErrorResponse(res, response);
+                }
+              })
+              .catch(function (reason) {
+                reason.getErrors().forEach(function (error) {
+                  console.log("Response Messages: " + (error, "en"));
+                });
+                return apiResponse.ErrorResponse(res, reason.getErrors());
               });
-              return apiResponse.ErrorResponse(res, reason.getErrors());
-            });
+          } else {
+            eway
+              .payment(paymentData)
+              .then(function (response) {
+                if (response.getErrors().length == 0) {
+                  var redirectURL = response.get("SharedPaymentUrl");
+                  let orderData = {
+                    _id: order._id,
+                    createdAt: order.createdAt,
+                    redirectURL: redirectURL,
+                  };
+                  return apiResponse.successResponseWithData(
+                    res,
+                    "Order Success.",
+                    orderData
+                  );
+                } else {
+                  return apiResponse.ErrorResponse(res, response);
+                }
+              })
+              .catch(function (reason) {
+                reason.getErrors().forEach(function (error) {
+                  console.log("Response Messages: " + (error, "en"));
+                });
+                return apiResponse.ErrorResponse(res, reason.getErrors());
+              });
+          }
         });
       }
     } catch (err) {
