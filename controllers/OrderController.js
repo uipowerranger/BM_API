@@ -33,53 +33,99 @@ mongoose.set("useFindAndModify", false);
 exports.create = [
   auth,
   // Validate fields.
-  body("first_name", "First name is required").exists().isString(),
-  body("last_name", "Last name is required").exists().isString(),
+  body("first_name", "First name is required")
+    .exists()
+    .isLength({ min: 1 })
+    .isString(),
+  body("last_name", "Last name is required")
+    .exists()
+    .isLength({ min: 1 })
+    .isString(),
   body("items")
     .isLength({ min: 1 })
     .withMessage("Items cannot be empty")
     .isArray()
     .withMessage("Items must be Array of objects."),
-  body("items.*.item_id", "Item_id must be a string").exists().isString(),
-  body("items.*.item_name", "Item name must be a string").exists().isString(),
-  body("items.*.item_image", "Item image must be a string").exists().isString(),
-  body("items.*.quantity", "Quantity must be a number").exists().isInt(),
-  body("items.*.price", "Price must be a Decimal").exists().isDecimal(),
-  body("items.*.amount", "Amount must be a Decimal").exists().isDecimal(),
-  body("total_amount", "Total must be a Decimal").exists().isDecimal(),
-  body("email_id", "Email is required").exists().isString(),
-  body("phone_number", "Phone number is required").exists().isString(),
+  body("items.*.item_id", "Item_id must be a string")
+    .exists()
+    .isLength({ min: 1 })
+    .isString(),
+  body("items.*.item_name", "Item name must be a string")
+    .exists()
+    .isLength({ min: 1 })
+    .isString(),
+  body("items.*.item_image", "Item image must be a string")
+    .exists()
+    .isLength({ min: 1 })
+    .isString(),
+  body("items.*.quantity", "Quantity must be a number")
+    .exists()
+    .isLength({ min: 1 })
+    .isInt(),
+  body("items.*.price", "Price must be a Decimal")
+    .exists()
+    .isLength({ min: 1 })
+    .isDecimal(),
+  body("items.*.amount", "Amount must be a Decimal")
+    .exists()
+    .isLength({ min: 1 })
+    .isDecimal(),
+  body("total_amount", "Total must be a Decimal")
+    .exists()
+    .isLength({ min: 1 })
+    .isDecimal(),
+  body("email_id", "Email is required")
+    .exists()
+    .isLength({ min: 1 })
+    .isString(),
+  body("phone_number", "Phone number is required")
+    .exists()
+    .isLength({ min: 1 })
+    .isString(),
   body("mailing_address.address1", "Mailing address1 must be entered")
     .exists()
+    .isLength({ min: 1 })
     .isString(),
   body("mailing_address.city", "Mailing City must be entered")
     .exists()
+    .isLength({ min: 1 })
     .isString(),
   body("mailing_address.state", "Mailing State must be entered")
     .exists()
+    .isLength({ min: 1 })
     .isString(),
   body("mailing_address.postcode", "Mailing Postcode Code must be entered")
     .exists()
+    .isLength({ min: 1 })
     .isString(),
   body("shipping_address.address1", "Shipping address1 must be entered")
     .exists()
+    .isLength({ min: 1 })
     .isString(),
   body("shipping_address.city", "Shipping City must be entered")
     .exists()
+    .isLength({ min: 1 })
     .isString(),
   body("shipping_address.state", "Shipping State must be entered")
     .exists()
+    .isLength({ min: 1 })
     .isString(),
   body("shipping_address.postcode", "Shipping Postcode Code must be entered")
     .exists()
+    .isLength({ min: 1 })
     .isString(),
   body("state_details", "User selected state details is required")
     .exists()
+    .isLength({ min: 1 })
     .isString(),
   body("redeempoints_used", "User redeempoints_used is required")
     .exists()
+    .isLength({ min: 1 })
     .isNumeric(),
-  body("delivery_charges", "Delivery charges is required").exists().isNumeric(),
+  body("delivery_charges", "Delivery charges is required")
+    .exists()
+    .isLength({ min: 1 })
+    .isNumeric(),
   // Process request after validation and sanitization.
   (req, res) => {
     try {
