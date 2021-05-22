@@ -172,59 +172,31 @@ exports.create = [
             },
           };
           //console.log(paymentData);
-          if (!!req.body.isMobile) {
-            ewaymobile
-              .payment(paymentData)
-              .then(function (response) {
-                if (response.getErrors().length == 0) {
-                  var redirectURL = response.get("SharedPaymentUrl");
-                  let orderData = {
-                    _id: order._id,
-                    createdAt: order.createdAt,
-                    redirectURL: redirectURL,
-                  };
-                  return apiResponse.successResponseWithData(
-                    res,
-                    "Order Success.",
-                    orderData
-                  );
-                } else {
-                  return apiResponse.ErrorResponse(res, response);
-                }
-              })
-              .catch(function (reason) {
-                reason.getErrors().forEach(function (error) {
-                  console.log("Response Messages: " + (error, "en"));
-                });
-                return apiResponse.ErrorResponse(res, reason.getErrors());
+          eway
+            .payment(paymentData)
+            .then(function (response) {
+              if (response.getErrors().length == 0) {
+                var redirectURL = response.get("SharedPaymentUrl");
+                let orderData = {
+                  _id: order._id,
+                  createdAt: order.createdAt,
+                  redirectURL: redirectURL,
+                };
+                return apiResponse.successResponseWithData(
+                  res,
+                  "Order Success.",
+                  orderData
+                );
+              } else {
+                return apiResponse.ErrorResponse(res, response);
+              }
+            })
+            .catch(function (reason) {
+              reason.getErrors().forEach(function (error) {
+                console.log("Response Messages: " + (error, "en"));
               });
-          } else {
-            eway
-              .payment(paymentData)
-              .then(function (response) {
-                if (response.getErrors().length == 0) {
-                  var redirectURL = response.get("SharedPaymentUrl");
-                  let orderData = {
-                    _id: order._id,
-                    createdAt: order.createdAt,
-                    redirectURL: redirectURL,
-                  };
-                  return apiResponse.successResponseWithData(
-                    res,
-                    "Order Success.",
-                    orderData
-                  );
-                } else {
-                  return apiResponse.ErrorResponse(res, response);
-                }
-              })
-              .catch(function (reason) {
-                reason.getErrors().forEach(function (error) {
-                  console.log("Response Messages: " + (error, "en"));
-                });
-                return apiResponse.ErrorResponse(res, reason.getErrors());
-              });
-          }
+              return apiResponse.ErrorResponse(res, reason.getErrors());
+            });
         });
       }
     } catch (err) {
