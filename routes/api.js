@@ -17,6 +17,7 @@ var stockRouter = require("./stock");
 var carouselRouter = require("./carousel");
 var unitsRouter = require("./units");
 var filterRouter = require("./filters");
+var citiesRouter = require("./cities");
 
 var app = express();
 
@@ -38,5 +39,6 @@ app.use("/stock", stockRouter);
 app.use("/carousel", carouselRouter);
 app.use("/units", unitsRouter);
 app.use("/filters", filterRouter);
+app.use("/cities", citiesRouter);
 
 module.exports = app;

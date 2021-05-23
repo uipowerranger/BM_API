@@ -78,7 +78,6 @@ exports.CategoryList = [
  */
 exports.CategoryListByState = [
   function (req, res) {
-    console.log(req.params.state);
     try {
       CategoryModel.aggregate([
         { $sort: { order_number: 1 } },
