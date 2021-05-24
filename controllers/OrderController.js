@@ -441,7 +441,6 @@ const getUserData = async (user) => {
 };
 
 exports.VerifyToken = [
-  auth,
   body("AccessCode", "AccessCode is required")
     .exists()
     .isLength({ min: 10 })
