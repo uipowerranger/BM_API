@@ -18,6 +18,7 @@ var carouselRouter = require("./carousel");
 var unitsRouter = require("./units");
 var filterRouter = require("./filters");
 var citiesRouter = require("./cities");
+var giftboxRouter = require("./giftbox");
 
 var app = express();
 
@@ -40,5 +41,6 @@ app.use("/carousel", carouselRouter);
 app.use("/units", unitsRouter);
 app.use("/filters", filterRouter);
 app.use("/cities", citiesRouter);
+app.use("/giftbox", giftboxRouter);
 
 module.exports = app;
