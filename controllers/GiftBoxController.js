@@ -57,6 +57,10 @@ exports.create = [
     .exists()
     .isLength({ min: 1 })
     .isDecimal(),
+  body("items.*.mandatefield", "Please select One")
+    .exists()
+    .isLength({ min: 1 })
+    .isBoolean(),
   body("total_amount", "Total must be a Decimal")
     .exists()
     .isLength({ min: 1 })
