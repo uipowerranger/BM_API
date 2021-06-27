@@ -13,6 +13,8 @@ var GiftSchema = new mongoose.Schema(
         price: { type: Number, required: true, default: 1 },
         amount: { type: Number, required: true, default: 1 },
         mandatefield: { type: Boolean, required: true, default: false },
+        iseditable: { type: Boolean, required: true, default: false },
+        offer: { type: String, required: false, default: "" },
       },
     ],
     status: { type: Number, required: true, default: 1 },
