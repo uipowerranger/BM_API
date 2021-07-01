@@ -10,6 +10,7 @@ var StockSchema = new Schema(
     item_id: { type: Schema.ObjectId, ref: "products", required: true },
     quantity: { type: Number, required: true },
     status: { type: Number, required: true, default: 1 },
+    state: { type: String, required: false, default: "" },
     transactionType: { type: String, required: false, default: "" },
   },
   { timestamps: true }

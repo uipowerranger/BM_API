@@ -2,6 +2,8 @@ const StockMoveModel = require("../models/StockMoveModel");
 const ProductModel = require("../models/ProductModel");
 const { body, validationResult } = require("express-validator");
 //helper file to prepare responses.
+
+const AllStateModel = require("../models/StateModel");
 const apiResponse = require("../helpers/apiResponse");
 const auth = require("../middlewares/jwt");
 var mongoose = require("mongoose");
@@ -211,6 +213,17 @@ exports.AllProducts = [
           },
         },
         {
+          $lookup: {
+            from: "states",
+            localField: "state_details",
+            foreignField: "_id",
+            as: "map_state",
+          },
+        },
+        {
+          $unwind: "$map_state",
+        },
+        {
           $project: {
             _id: 1,
             item_name: 1,
@@ -221,6 +234,8 @@ exports.AllProducts = [
             "stocks.user": 1,
             "stocks.status": 1,
             "stocks.quantity": 1,
+            "map_state._id": 1,
+            "map_state.state_name": 1,
           },
         },
       ]).then((response) => {
@@ -241,6 +256,8 @@ exports.AllProducts = [
           aData["totalPurchase"] = purQty;
           aData["totalSold"] = qty;
           aData["currentStock"] = purQty - qty;
+          aData["stateId"] = it.map_state._id;
+          aData["stateName"] = it.map_state.state_name;
           return aData;
         });
         return apiResponse.successResponseWithData(
@@ -333,7 +350,7 @@ exports.ProductStockAdj = [
             status: it.status,
             transactionType: "By Adjustment",
           });
-          stock.save((err, msg) => {});
+          stock.save((err, msg) => { });
         });
         return apiResponse.successResponse(res, "Stocks Updated");
       }
