@@ -1,15 +1,17 @@
-const GiftBoxModel = require("../models/GiftBoxModel");
-const { body, validationResult } = require("express-validator");
+const GiftBoxModel = require( "../models/GiftBoxModel" );
+
+const StateModel = require( "../models/StateModel" );
+const { body, validationResult } = require( "express-validator" );
 //helper file to prepare responses.
-const apiResponse = require("../helpers/apiResponse");
-const utility = require("../helpers/utility");
-const jwt = require("jsonwebtoken");
-const auth = require("../middlewares/jwt");
-var mongoose = require("mongoose");
+const apiResponse = require( "../helpers/apiResponse" );
+const utility = require( "../helpers/utility" );
+const jwt = require( "jsonwebtoken" );
+const auth = require( "../middlewares/jwt" );
+var mongoose = require( "mongoose" );
 
 // Default export is a4 paper, portrait, using millimeters for units
 
-mongoose.set("useFindAndModify", false);
+mongoose.set( "useFindAndModify", false );
 
 /**
  * User registration.
@@ -21,56 +23,69 @@ mongoose.set("useFindAndModify", false);
  *
  * @returns {Object}
  */
+
 exports.create = [
+
   auth,
-  // Validate fields.
-  body("box_name", "Box name is required")
+  body( "state_id", "State Id must not be empty......" )
+    .isLength( { min: 1 } )
+    .trim()
+    .custom( ( value, { req } ) => {
+      return StateModel.findOne( { _id: value } ).then( ( cat ) => {
+        if ( !cat ) {
+          return Promise.reject( "Enter valid state ID" );
+        }
+      } );
+    } ),
+  body( "state_name", "State Name must not be empty......" )
     .exists()
-    .isLength({ min: 1 })
+    .isLength( { min: 1 } )
     .isString(),
-  body("items")
-    .isLength({ min: 1 })
-    .withMessage("Items cannot be empty")
+  body( "box_name", "Box name is required" )
+    .exists()
+    .isLength( { min: 1 } )
+    .isString(),
+  body( "items" )
+    .isLength( { min: 1 } )
+    .withMessage( "Items cannot be empty" )
     .isArray()
-    .withMessage("Items must be Array of objects."),
-  body("items.*.item_id", "Item_id must be a string")
+    .withMessage( "Items must be Array of objects." ),
+  body( "items.*.item_id", "Item_id must be a string" )
     .exists()
-    .isLength({ min: 1 })
+    .isLength( { min: 1 } )
     .isString(),
-  body("items.*.item_name", "Item name must be a string")
+  body( "items.*.item_name", "Item name must be a string" )
     .exists()
-    .isLength({ min: 1 })
+    .isLength( { min: 1 } )
     .isString(),
-  body("items.*.item_image", "Item image must be a string")
+  body( "items.*.item_image", "Item image must be a string" )
     .exists()
-    .isLength({ min: 1 })
+    .isLength( { min: 1 } )
     .isString(),
-  body("items.*.quantity", "Quantity must be a number")
+  body( "items.*.quantity", "Quantity must be a number" )
     .exists()
-    .isLength({ min: 1 })
+    .isLength( { min: 1 } )
     .isInt(),
-  body("items.*.price", "Price must be a Decimal")
+  body( "items.*.price", "Price must be a Decimal" )
     .exists()
-    .isLength({ min: 1 })
+    .isLength( { min: 1 } )
     .isDecimal(),
-  body("items.*.amount", "Amount must be a Decimal")
+  body( "items.*.amount", "Amount must be a Decimal" )
     .exists()
-    .isLength({ min: 1 })
+    .isLength( { min: 1 } )
     .isDecimal(),
-  body("items.*.mandatefield", "Please select One")
+  body( "items.*.mandatefield", "Please select One" )
     .exists()
-    .isLength({ min: 1 })
+    .isLength( { min: 1 } )
     .isBoolean(),
-  body("total_amount", "Total must be a Decimal")
+  body( "total_amount", "Total must be a Decimal" )
     .exists()
-    .isLength({ min: 1 })
+    .isLength( { min: 1 } )
     .isDecimal(),
-  // Process request after validation and sanitization.
-  (req, res) => {
+  function ( req, res ) {
     try {
-      // Extract the validation errors from a request.
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
+      const errors = validationResult( req );
+      if ( !errors.isEmpty() ) {
         // Display sanitized values/errors messages.
         return apiResponse.validationErrorWithData(
           res,
@@ -79,31 +94,34 @@ exports.create = [
         );
       } else {
         const { _id, ...rest } = req.body;
-        var order = new GiftBoxModel({
+        var order = new GiftBoxModel( {
+          state: req.body.state_id,
+          state_name: req.body.state_name,
           user: req.user._id,
           ...rest,
-        });
+        } );
         // Save order.
-        order.save(function (err) {
-          if (err) {
-            return apiResponse.ErrorResponse(res, err);
-          } else {
-            return apiResponse.successResponse(res, "Giftbox Created");
-          }
-        });
-      }
-    } catch (err) {
-      //throw error in json response with status 500.
-      return apiResponse.ErrorResponse(res, err);
-    }
-  },
-];
 
+        order.save( function ( err ) {
+          if ( err ) {
+            return apiResponse.ErrorResponse( res, err );
+          } else {
+            return apiResponse.successResponse( res, "Giftbox Created" );
+          }
+        } );
+      }
+    } catch ( err ) {
+      //throw error in json response with status 500.
+      return apiResponse.ErrorResponse( res, err );
+    }
+  }
+]
 exports.list = [
-  function (req, res) {
+  function ( req, res ) {
     try {
-      GiftBoxModel.find({ status: { $eq: 1 } }).then((orders) => {
-        if (orders.length > 0) {
+      GiftBoxModel.find( { status: { $eq: 1 } } ).then( ( orders ) => {
+        if ( orders.length > 0 ) {
+
           return apiResponse.successResponseWithData(
             res,
             "Operation success",
@@ -116,31 +134,31 @@ exports.list = [
             []
           );
         }
-      });
-    } catch (err) {
+      } );
+    } catch ( err ) {
       //throw error in json response with status 500.
-      return apiResponse.ErrorResponse(res, err);
+      return apiResponse.ErrorResponse( res, err );
     }
   },
 ];
 
 exports.delete = [
   auth,
-  function (req, res) {
+  function ( req, res ) {
     try {
-      if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-        return apiResponse.ErrorResponse(res, "Invalid ID");
+      if ( !mongoose.Types.ObjectId.isValid( req.params.id ) ) {
+        return apiResponse.ErrorResponse( res, "Invalid ID" );
       }
-      GiftBoxModel.findByIdAndDelete(req.params.id).then((orders) => {
-        if (orders) {
-          return apiResponse.successResponse(res, "Operation success");
+      GiftBoxModel.findByIdAndDelete( req.params.id ).then( ( orders ) => {
+        if ( orders ) {
+          return apiResponse.successResponse( res, "Operation success" );
         } else {
-          return apiResponse.ErrorResponse(res, "Id not found");
+          return apiResponse.ErrorResponse( res, "Id not found" );
         }
-      });
-    } catch (err) {
+      } );
+    } catch ( err ) {
       //throw error in json response with status 500.
-      return apiResponse.ErrorResponse(res, err);
+      return apiResponse.ErrorResponse( res, err );
     }
   },
 ];

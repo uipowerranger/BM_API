@@ -1,4 +1,4 @@
-var mongoose = require("mongoose");
+var mongoose = require( "mongoose" );
 var Schema = mongoose.Schema;
 
 var GiftSchema = new mongoose.Schema(
@@ -15,8 +15,11 @@ var GiftSchema = new mongoose.Schema(
         mandatefield: { type: Boolean, required: true, default: false },
         iseditable: { type: Boolean, required: true, default: false },
         offer: { type: String, required: false, default: "" },
+
       },
     ],
+    state_id: { type: Schema.ObjectId, ref: "states", required: true },
+    state_name: { type: String, required: false },
     status: { type: Number, required: true, default: 1 },
     total_amount: { type: Number, required: true, default: 0 },
     box_name: { type: String, required: true },
@@ -24,4 +27,4 @@ var GiftSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("giftbox", GiftSchema);
+module.exports = mongoose.model( "giftbox", GiftSchema );

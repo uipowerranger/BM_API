@@ -1,13 +1,13 @@
-const PostcodeModel = require("../models/PostcodeModel");
-const StateModel = require("../models/StateModel");
-const { body, validationResult } = require("express-validator");
-const apiResponse = require("../helpers/apiResponse");
-const auth = require("../middlewares/jwt");
-var mongoose = require("mongoose");
-mongoose.set("useFindAndModify", false);
+const PostcodeModel = require( "../models/PostcodeModel" );
+const StateModel = require( "../models/StateModel" );
+const { body, validationResult } = require( "express-validator" );
+const apiResponse = require( "../helpers/apiResponse" );
+const auth = require( "../middlewares/jwt" );
+var mongoose = require( "mongoose" );
+mongoose.set( "useFindAndModify", false );
 
 // Category Schema
-function PostcodeData(data) {
+function PostcodeData ( data ) {
   this.id = data._id;
   this.post_code = data.post_code;
   this.state = data.state;
@@ -20,9 +20,9 @@ function PostcodeData(data) {
  * @returns {Object}
  */
 exports.PostcodeList = [
-  function (req, res) {
+  function ( req, res ) {
     try {
-      PostcodeModel.aggregate([
+      PostcodeModel.aggregate( [
         {
           $lookup: {
             from: "states",
@@ -45,8 +45,8 @@ exports.PostcodeList = [
           },
         },
         { $match: { status: { $ne: 3 } } },
-      ]).then((postcodes) => {
-        if (postcodes.length > 0) {
+      ] ).then( ( postcodes ) => {
+        if ( postcodes.length > 0 ) {
           return apiResponse.successResponseWithData(
             res,
             "Operation success",
@@ -59,18 +59,18 @@ exports.PostcodeList = [
             []
           );
         }
-      });
-    } catch (err) {
+      } );
+    } catch ( err ) {
       //throw error in json response with status 500.
-      return apiResponse.ErrorResponse(res, err);
+      return apiResponse.ErrorResponse( res, err );
     }
   },
 ];
 
 exports.PostcodeListById = [
-  function (req, res) {
+  function ( req, res ) {
     try {
-      PostcodeModel.aggregate([
+      PostcodeModel.aggregate( [
         {
           $lookup: {
             from: "states",
@@ -84,7 +84,7 @@ exports.PostcodeListById = [
         },
         {
           $match: {
-            state: mongoose.Types.ObjectId(req.params.id),
+            state: mongoose.Types.ObjectId( req.params.id ),
           },
         },
         {
@@ -97,8 +97,8 @@ exports.PostcodeListById = [
             "map_state.state_name": 1,
           },
         },
-      ]).then((postcodes) => {
-        if (postcodes.length > 0) {
+      ] ).then( ( postcodes ) => {
+        if ( postcodes.length > 0 ) {
           return apiResponse.successResponseWithData(
             res,
             "Operation success",
@@ -111,10 +111,10 @@ exports.PostcodeListById = [
             []
           );
         }
-      });
-    } catch (err) {
+      } );
+    } catch ( err ) {
       //throw error in json response with status 500.
-      return apiResponse.ErrorResponse(res, err);
+      return apiResponse.ErrorResponse( res, err );
     }
   },
 ];
@@ -128,40 +128,40 @@ exports.PostcodeListById = [
  */
 exports.PostcodeStore = [
   auth,
-  body("post_code", "Postcode must not be empty.")
-    .isLength({ min: 3 })
-    .withMessage("Minimum 3 characters.")
+  body( "post_code", "Postcode must not be empty." )
+    .isLength( { min: 3 } )
+    .withMessage( "Minimum 3 characters." )
     .trim()
     .escape()
-    .custom((value, { req }) => {
-      return PostcodeModel.findOne({
+    .custom( ( value, { req } ) => {
+      return PostcodeModel.findOne( {
         post_code: value,
         status: { $ne: 3 },
-      }).then((cat) => {
-        if (cat) {
-          return Promise.reject("Postcode already exist.");
+      } ).then( ( cat ) => {
+        if ( cat ) {
+          return Promise.reject( "Postcode already exist." );
         }
-      });
-    }),
-  body("state", "State must not be empty")
-    .isLength({ min: 1 })
+      } );
+    } ),
+  body( "state", "State must not be empty" )
+    .isLength( { min: 1 } )
     .trim()
-    .custom((value, { req }) => {
-      return StateModel.findOne({ _id: value }).then((cat) => {
-        if (!cat) {
-          return Promise.reject("Enter valid state ID");
+    .custom( ( value, { req } ) => {
+      return StateModel.findOne( { _id: value } ).then( ( cat ) => {
+        if ( !cat ) {
+          return Promise.reject( "Enter valid state ID" );
         }
-      });
-    }),
-  (req, res) => {
+      } );
+    } ),
+  ( req, res ) => {
     try {
-      const errors = validationResult(req);
-      var postcode = new PostcodeModel({
+      const errors = validationResult( req );
+      var postcode = new PostcodeModel( {
         post_code: req.body.post_code,
         state: req.body.state,
-      });
+      } );
 
-      if (!errors.isEmpty()) {
+      if ( !errors.isEmpty() ) {
         return apiResponse.validationErrorWithData(
           res,
           "Validation Error.",
@@ -169,21 +169,21 @@ exports.PostcodeStore = [
         );
       } else {
         //Save postcode.
-        postcode.save(function (err) {
-          if (err) {
-            return apiResponse.ErrorResponse(res, err);
+        postcode.save( function ( err ) {
+          if ( err ) {
+            return apiResponse.ErrorResponse( res, err );
           }
-          let data = new PostcodeData(postcode);
+          let data = new PostcodeData( postcode );
           return apiResponse.successResponseWithData(
             res,
             "Postcode add Success.",
             data
           );
-        });
+        } );
       }
-    } catch (err) {
+    } catch ( err ) {
       //throw error in json response with status 500.
-      return apiResponse.ErrorResponse(res, err);
+      return apiResponse.ErrorResponse( res, err );
     }
   },
 ];
@@ -199,43 +199,43 @@ exports.PostcodeStore = [
  */
 exports.PostcodeUpdate = [
   auth,
-  body("post_code", "Postcode must not be empty.").isLength({ min: 1 }).trim(),
-  body("state", "State must not be empty")
-    .isLength({ min: 1 })
+  body( "post_code", "Postcode must not be empty." ).isLength( { min: 1 } ).trim(),
+  body( "state", "State must not be empty" )
+    .isLength( { min: 1 } )
     .trim()
-    .custom((value, { req }) => {
-      return StateModel.findOne({ _id: value }).then((cat) => {
-        if (!cat) {
-          return Promise.reject("Enter valid state ID");
+    .custom( ( value, { req } ) => {
+      return StateModel.findOne( { _id: value } ).then( ( cat ) => {
+        if ( !cat ) {
+          return Promise.reject( "Enter valid state ID" );
         }
-      });
-    }),
-  (req, res) => {
+      } );
+    } ),
+  ( req, res ) => {
     try {
-      const errors = validationResult(req);
-      var category = new PostcodeModel({
+      const errors = validationResult( req );
+      var category = new PostcodeModel( {
         post_code: req.body.post_code,
         state: req.body.state,
         status: req.body.status,
         _id: req.params.id,
-      });
+      } );
 
-      if (!errors.isEmpty()) {
+      if ( !errors.isEmpty() ) {
         return apiResponse.validationErrorWithData(
           res,
           "Validation Error.",
           errors.array()
         );
       } else {
-        if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+        if ( !mongoose.Types.ObjectId.isValid( req.params.id ) ) {
           return apiResponse.validationErrorWithData(
             res,
             "Invalid Error.",
             "Invalid ID"
           );
         } else {
-          PostcodeModel.findById(req.params.id, function (err, foundCategory) {
-            if (foundCategory === null) {
+          PostcodeModel.findById( req.params.id, function ( err, foundCategory ) {
+            if ( foundCategory === null ) {
               return apiResponse.notFoundResponse(
                 res,
                 "Postcode not exists with this id"
@@ -246,11 +246,11 @@ exports.PostcodeUpdate = [
                 req.params.id,
                 category,
                 {},
-                function (err) {
-                  if (err) {
-                    return apiResponse.ErrorResponse(res, err);
+                function ( err ) {
+                  if ( err ) {
+                    return apiResponse.ErrorResponse( res, err );
                   } else {
-                    let Category_Data = new PostcodeData(category);
+                    let Category_Data = new PostcodeData( category );
                     return apiResponse.successResponseWithData(
                       res,
                       "Postcode update Success.",
@@ -260,12 +260,12 @@ exports.PostcodeUpdate = [
                 }
               );
             }
-          });
+          } );
         }
       }
-    } catch (err) {
+    } catch ( err ) {
       //throw error in json response with status 500.
-      return apiResponse.ErrorResponse(res, err);
+      return apiResponse.ErrorResponse( res, err );
     }
   },
 ];
@@ -279,8 +279,8 @@ exports.PostcodeUpdate = [
  */
 exports.PostcodeDelete = [
   auth,
-  function (req, res) {
-    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+  function ( req, res ) {
+    if ( !mongoose.Types.ObjectId.isValid( req.params.id ) ) {
       return apiResponse.validationErrorWithData(
         res,
         "Invalid Error.",
@@ -288,8 +288,8 @@ exports.PostcodeDelete = [
       );
     }
     try {
-      PostcodeModel.findById(req.params.id, function (err, foundCategory) {
-        if (foundCategory === null) {
+      PostcodeModel.findById( req.params.id, function ( err, foundCategory ) {
+        if ( foundCategory === null ) {
           return apiResponse.notFoundResponse(
             res,
             "Postcode not exists with this id"
@@ -300,9 +300,9 @@ exports.PostcodeDelete = [
             req.params.id,
             { status: 3 },
             {},
-            function (err) {
-              if (err) {
-                return apiResponse.ErrorResponse(res, err);
+            function ( err ) {
+              if ( err ) {
+                return apiResponse.ErrorResponse( res, err );
               } else {
                 return apiResponse.successResponse(
                   res,
@@ -312,10 +312,10 @@ exports.PostcodeDelete = [
             }
           );
         }
-      });
-    } catch (err) {
+      } );
+    } catch ( err ) {
       //throw error in json response with status 500.
-      return apiResponse.ErrorResponse(res, err);
+      return apiResponse.ErrorResponse( res, err );
     }
   },
 ];

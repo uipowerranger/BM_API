@@ -1,24 +1,24 @@
-const OrderModel = require("../models/OrderModel");
-const ProductModel = require("../models/ProductModel");
-const UserModel = require("../models/UserModel");
-const RedeemModel = require("../models/RedeemModel");
-const StockMoveModel = require("../models/StockMoveModel");
-const { body, validationResult } = require("express-validator");
+const OrderModel = require( "../models/OrderModel" );
+const ProductModel = require( "../models/ProductModel" );
+const UserModel = require( "../models/UserModel" );
+const RedeemModel = require( "../models/RedeemModel" );
+const StockMoveModel = require( "../models/StockMoveModel" );
+const { body, validationResult } = require( "express-validator" );
 //helper file to prepare responses.
-const apiResponse = require("../helpers/apiResponse");
-const utility = require("../helpers/utility");
-const jwt = require("jsonwebtoken");
-const auth = require("../middlewares/jwt");
-const mailer = require("../helpers/mailer");
-const eway = require("../helpers/eway");
-const ewaymobile = require("../helpers/eway-mobile");
-const twilio = require("../helpers/twilio");
-const { constants } = require("../helpers/constants");
-var mongoose = require("mongoose");
+const apiResponse = require( "../helpers/apiResponse" );
+const utility = require( "../helpers/utility" );
+const jwt = require( "jsonwebtoken" );
+const auth = require( "../middlewares/jwt" );
+const mailer = require( "../helpers/mailer" );
+const eway = require( "../helpers/eway" );
+const ewaymobile = require( "../helpers/eway-mobile" );
+const twilio = require( "../helpers/twilio" );
+const { constants } = require( "../helpers/constants" );
+var mongoose = require( "mongoose" );
 
 // Default export is a4 paper, portrait, using millimeters for units
 
-mongoose.set("useFindAndModify", false);
+mongoose.set( "useFindAndModify", false );
 
 /**
  * User registration.
@@ -33,105 +33,105 @@ mongoose.set("useFindAndModify", false);
 exports.create = [
   auth,
   // Validate fields.
-  body("first_name", "First name is required")
+  body( "first_name", "First name is required" )
     .exists()
-    .isLength({ min: 1 })
+    .isLength( { min: 1 } )
     .isString(),
-  body("last_name", "Last name is required")
+  body( "last_name", "Last name is required" )
     .exists()
-    .isLength({ min: 1 })
+    .isLength( { min: 1 } )
     .isString(),
-  body("items")
-    .isLength({ min: 1 })
-    .withMessage("Items cannot be empty")
+  body( "items" )
+    .isLength( { min: 1 } )
+    .withMessage( "Items cannot be empty" )
     .isArray()
-    .withMessage("Items must be Array of objects."),
-  body("items.*.item_id", "Item_id must be a string")
+    .withMessage( "Items must be Array of objects." ),
+  body( "items.*.item_id", "Item_id must be a string" )
     .exists()
-    .isLength({ min: 1 })
+    .isLength( { min: 1 } )
     .isString(),
-  body("items.*.item_name", "Item name must be a string")
+  body( "items.*.item_name", "Item name must be a string" )
     .exists()
-    .isLength({ min: 1 })
+    .isLength( { min: 1 } )
     .isString(),
-  body("items.*.item_image", "Item image must be a string")
+  body( "items.*.item_image", "Item image must be a string" )
     .exists()
-    .isLength({ min: 1 })
+    .isLength( { min: 1 } )
     .isString(),
-  body("items.*.quantity", "Quantity must be a number")
+  body( "items.*.quantity", "Quantity must be a number" )
     .exists()
-    .isLength({ min: 1 })
+    .isLength( { min: 1 } )
     .isInt(),
-  body("items.*.price", "Price must be a Decimal")
+  body( "items.*.price", "Price must be a Decimal" )
     .exists()
-    .isLength({ min: 1 })
+    .isLength( { min: 1 } )
     .isDecimal(),
-  body("items.*.amount", "Amount must be a Decimal")
+  body( "items.*.amount", "Amount must be a Decimal" )
     .exists()
-    .isLength({ min: 1 })
+    .isLength( { min: 1 } )
     .isDecimal(),
-  body("total_amount", "Total must be a Decimal")
+  body( "total_amount", "Total must be a Decimal" )
     .exists()
-    .isLength({ min: 1 })
+    .isLength( { min: 1 } )
     .isDecimal(),
-  body("email_id", "Email is required")
+  body( "email_id", "Email is required" )
     .exists()
-    .isLength({ min: 1 })
+    .isLength( { min: 1 } )
     .isString(),
-  body("phone_number", "Phone number is required")
+  body( "phone_number", "Phone number is required" )
     .exists()
-    .isLength({ min: 1 })
+    .isLength( { min: 1 } )
     .isString(),
-  body("mailing_address.address1", "Mailing address1 must be entered")
+  body( "mailing_address.address1", "Mailing address1 must be entered" )
     .exists()
-    .isLength({ min: 1 })
+    .isLength( { min: 1 } )
     .isString(),
-  body("mailing_address.city", "Mailing City must be entered")
+  body( "mailing_address.city", "Mailing City must be entered" )
     .exists()
-    .isLength({ min: 1 })
+    .isLength( { min: 1 } )
     .isString(),
-  body("mailing_address.state", "Mailing State must be entered")
+  body( "mailing_address.state", "Mailing State must be entered" )
     .exists()
-    .isLength({ min: 1 })
+    .isLength( { min: 1 } )
     .isString(),
-  body("mailing_address.postcode", "Mailing Postcode Code must be entered")
+  body( "mailing_address.postcode", "Mailing Postcode Code must be entered" )
     .exists()
-    .isLength({ min: 1 })
+    .isLength( { min: 1 } )
     .isString(),
-  body("shipping_address.address1", "Shipping address1 must be entered")
+  body( "shipping_address.address1", "Shipping address1 must be entered" )
     .exists()
-    .isLength({ min: 1 })
+    .isLength( { min: 1 } )
     .isString(),
-  body("shipping_address.city", "Shipping City must be entered")
+  body( "shipping_address.city", "Shipping City must be entered" )
     .exists()
-    .isLength({ min: 1 })
+    .isLength( { min: 1 } )
     .isString(),
-  body("shipping_address.state", "Shipping State must be entered")
+  body( "shipping_address.state", "Shipping State must be entered" )
     .exists()
-    .isLength({ min: 1 })
+    .isLength( { min: 1 } )
     .isString(),
-  body("shipping_address.postcode", "Shipping Postcode Code must be entered")
+  body( "shipping_address.postcode", "Shipping Postcode Code must be entered" )
     .exists()
-    .isLength({ min: 1 })
+    .isLength( { min: 1 } )
     .isString(),
-  body("state_details", "User selected state details is required")
+  body( "state_details", "User selected state details is required" )
     .exists()
-    .isLength({ min: 1 })
+    .isLength( { min: 1 } )
     .isString(),
-  body("redeempoints_used", "User redeempoints_used is required")
+  body( "redeempoints_used", "User redeempoints_used is required" )
     .exists()
-    .isLength({ min: 1 })
+    .isLength( { min: 1 } )
     .isNumeric(),
-  body("delivery_charges", "Delivery charges is required")
+  body( "delivery_charges", "Delivery charges is required" )
     .exists()
-    .isLength({ min: 1 })
+    .isLength( { min: 1 } )
     .isNumeric(),
   // Process request after validation and sanitization.
-  (req, res) => {
+  ( req, res ) => {
     try {
       // Extract the validation errors from a request.
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
+      const errors = validationResult( req );
+      if ( !errors.isEmpty() ) {
         // Display sanitized values/errors messages.
         return apiResponse.validationErrorWithData(
           res,
@@ -140,14 +140,14 @@ exports.create = [
         );
       } else {
         const { _id, ...rest } = req.body;
-        var order = new OrderModel({
+        var order = new OrderModel( {
           user: req.user._id,
           ...rest,
-        });
+        } );
         // Save order.
-        order.save(function (err) {
-          if (err) {
-            return apiResponse.ErrorResponse(res, err);
+        order.save( function ( err ) {
+          if ( err ) {
+            return apiResponse.ErrorResponse( res, err );
           }
           let paymentData = {
             Customer: {
@@ -164,7 +164,7 @@ exports.create = [
               Phone: req.body.phone_number,
             },
             Payment: {
-              TotalAmount: Number(req.body.total_amount) * 100,
+              TotalAmount: Number( req.body.total_amount ) * 100,
               InvoiceNumber: order._id,
               InvoiceDescription: "Birlamart Purchase",
               InvoiceReference: "",
@@ -173,10 +173,10 @@ exports.create = [
           };
           //console.log(paymentData);
           eway
-            .payment(paymentData)
-            .then(function (response) {
-              if (response.getErrors().length == 0) {
-                var redirectURL = response.get("SharedPaymentUrl");
+            .payment( paymentData )
+            .then( function ( response ) {
+              if ( response.getErrors().length == 0 ) {
+                var redirectURL = response.get( "SharedPaymentUrl" );
                 let orderData = {
                   _id: order._id,
                   createdAt: order.createdAt,
@@ -188,20 +188,20 @@ exports.create = [
                   orderData
                 );
               } else {
-                return apiResponse.ErrorResponse(res, response);
+                return apiResponse.ErrorResponse( res, response );
               }
-            })
-            .catch(function (reason) {
-              reason.getErrors().forEach(function (error) {
-                console.log("Response Messages: " + (error, "en"));
-              });
-              return apiResponse.ErrorResponse(res, reason.getErrors());
-            });
-        });
+            } )
+            .catch( function ( reason ) {
+              reason.getErrors().forEach( function ( error ) {
+                console.log( "Response Messages: " + ( error, "en" ) );
+              } );
+              return apiResponse.ErrorResponse( res, reason.getErrors() );
+            } );
+        } );
       }
-    } catch (err) {
+    } catch ( err ) {
       //throw error in json response with status 500.
-      return apiResponse.ErrorResponse(res, err);
+      return apiResponse.ErrorResponse( res, err );
     }
   },
 ];
@@ -212,9 +212,9 @@ exports.create = [
 
 exports.OrdersList = [
   auth,
-  function (req, res) {
+  function ( req, res ) {
     try {
-      OrderModel.aggregate([
+      OrderModel.aggregate( [
         {
           $lookup: {
             from: "users",
@@ -223,17 +223,9 @@ exports.OrdersList = [
             as: "map_user",
           },
         },
-        // {
-        //   $lookup: {
-        //     from: "products",
-        //     localField: "items",
-        //     foreignField: "_id",
-        //     as: "map_products",
-        //   },
-        // },
         {
           $match: {
-            user: { $eq: mongoose.Types.ObjectId(req.user._id) },
+            user: { $eq: mongoose.Types.ObjectId( req.user._id ) },
           },
         },
         {
@@ -244,8 +236,8 @@ exports.OrdersList = [
             "map_user.updatedAt": 0,
           },
         },
-      ]).then((orders) => {
-        if (orders.length > 0) {
+      ] ).then( ( orders ) => {
+        if ( orders.length > 0 ) {
           return apiResponse.successResponseWithData(
             res,
             "Operation success",
@@ -258,18 +250,18 @@ exports.OrdersList = [
             []
           );
         }
-      });
-    } catch (err) {
+      } );
+    } catch ( err ) {
       //throw error in json response with status 500.
-      return apiResponse.ErrorResponse(res, err);
+      return apiResponse.ErrorResponse( res, err );
     }
   },
 ];
 
 exports.OrdersListAll = [
-  function (req, res) {
+  function ( req, res ) {
     try {
-      OrderModel.aggregate([
+      OrderModel.aggregate( [
         {
           $lookup: {
             from: "users",
@@ -278,19 +270,6 @@ exports.OrdersListAll = [
             as: "map_user",
           },
         },
-        // {
-        //   $lookup: {
-        //     from: "products",
-        //     localField: "items",
-        //     foreignField: "_id",
-        //     as: "map_products",
-        //   },
-        // },
-        // {
-        //   $match: {
-        //     user: { $eq: mongoose.Types.ObjectId(req.user._id) },
-        //   },
-        // },
         {
           $project: {
             __v: 0,
@@ -299,8 +278,8 @@ exports.OrdersListAll = [
             "map_user.updatedAt": 0,
           },
         },
-      ]).then((orders) => {
-        if (orders.length > 0) {
+      ] ).then( ( orders ) => {
+        if ( orders.length > 0 ) {
           return apiResponse.successResponseWithData(
             res,
             "Operation success",
@@ -313,22 +292,22 @@ exports.OrdersListAll = [
             []
           );
         }
-      });
-    } catch (err) {
+      } );
+    } catch ( err ) {
       //throw error in json response with status 500.
-      return apiResponse.ErrorResponse(res, err);
+      return apiResponse.ErrorResponse( res, err );
     }
   },
 ];
 
 exports.OrdersByDate = [
   auth,
-  body("from_date", "From date is required").exists(),
-  body("to_date", "To date is required").exists(),
-  function (req, res) {
+  body( "from_date", "From date is required" ).exists(),
+  body( "to_date", "To date is required" ).exists(),
+  function ( req, res ) {
     try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
+      const errors = validationResult( req );
+      if ( !errors.isEmpty() ) {
         // Display sanitized values/errors messages.
         return apiResponse.validationErrorWithData(
           res,
@@ -336,7 +315,7 @@ exports.OrdersByDate = [
           errors.array()
         );
       } else {
-        OrderModel.aggregate([
+        OrderModel.aggregate( [
           {
             $lookup: {
               from: "users",
@@ -349,14 +328,14 @@ exports.OrdersByDate = [
             $match: {
               order_date: {
                 $gte: new Date(
-                  new Date(req.body.from_date).setHours(00, 00, 00)
+                  new Date( req.body.from_date ).setHours( 00, 00, 00 )
                 ),
-                $lt: new Date(new Date(req.body.to_date).setHours(23, 59, 59)),
+                $lt: new Date( new Date( req.body.to_date ).setHours( 23, 59, 59 ) ),
               },
             },
           },
-        ]).then((orders) => {
-          if (orders.length > 0) {
+        ] ).then( ( orders ) => {
+          if ( orders.length > 0 ) {
             return apiResponse.successResponseWithData(
               res,
               "Operation success",
@@ -369,30 +348,22 @@ exports.OrdersByDate = [
               []
             );
           }
-        });
+        } );
       }
-    } catch (err) {
+    } catch ( err ) {
       //throw error in json response with status 500.
-      return apiResponse.ErrorResponse(res, err);
+      return apiResponse.ErrorResponse( res, err );
     }
   },
 ];
-
-exports.OrderUpdateStatus = [
+exports.OrdersByState = [
   auth,
-  body("order_id", "Order id is required").exists(),
-  body("payment", "payment status is required")
-    .notEmpty()
-    .isIn([0, 1])
-    .withMessage("Values should be either 0 or 1"),
-  body("order_completed", "order_completed status is required")
-    .notEmpty()
-    .isIn([0, 1])
-    .withMessage("Values should be either 0 or 1"),
-  (req, res) => {
+  body( "from_date", "From date is required" ).exists(),
+  body( "to_date", "To date is required" ).exists(),
+  function ( req, res ) {
     try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
+      const errors = validationResult( req );
+      if ( !errors.isEmpty() ) {
         // Display sanitized values/errors messages.
         return apiResponse.validationErrorWithData(
           res,
@@ -400,7 +371,71 @@ exports.OrderUpdateStatus = [
           errors.array()
         );
       } else {
-        if (!mongoose.Types.ObjectId.isValid(req.body.order_id)) {
+        OrderModel.aggregate( [
+          {
+            $lookup: {
+              from: "users",
+              localField: "user",
+              foreignField: "_id",
+              as: "map_user",
+            },
+          },
+          {
+            $match: {
+              order_date: {
+                $gte: new Date(
+                  new Date( req.body.from_date ).setHours( 00, 00, 00 )
+                ),
+                $lt: new Date( new Date( req.body.to_date ).setHours( 23, 59, 59 ) ),
+              },
+            },
+          },
+        ] ).then( ( orders ) => {
+          if ( orders.length > 0 ) {
+            return apiResponse.successResponseWithData(
+              res,
+              "Operation success",
+              orders
+            );
+          } else {
+            return apiResponse.successResponseWithData(
+              res,
+              "Operation success",
+              []
+            );
+          }
+        } );
+      }
+    } catch ( err ) {
+      //throw error in json response with status 500.
+      return apiResponse.ErrorResponse( res, err );
+    }
+  },
+];
+
+exports.OrderUpdateStatus = [
+  auth,
+  body( "order_id", "Order id is required" ).exists(),
+  body( "payment", "payment status is required" )
+    .notEmpty()
+    .isIn( [0, 1] )
+    .withMessage( "Values should be either 0 or 1" ),
+  body( "order_completed", "order_completed status is required" )
+    .notEmpty()
+    .isIn( [0, 1] )
+    .withMessage( "Values should be either 0 or 1" ),
+  ( req, res ) => {
+    try {
+      const errors = validationResult( req );
+      if ( !errors.isEmpty() ) {
+        // Display sanitized values/errors messages.
+        return apiResponse.validationErrorWithData(
+          res,
+          "Validation Error.",
+          errors.array()
+        );
+      } else {
+        if ( !mongoose.Types.ObjectId.isValid( req.body.order_id ) ) {
           return apiResponse.validationErrorWithData(
             res,
             "Invalid Error.",
@@ -411,9 +446,9 @@ exports.OrderUpdateStatus = [
           OrderModel.updateOne(
             { _id: req.body.order_id },
             rest,
-            function (err, data) {
-              if (err) {
-                return apiResponse.ErrorResponse(res, err);
+            function ( err, data ) {
+              if ( err ) {
+                return apiResponse.ErrorResponse( res, err );
               } else {
                 return apiResponse.successResponseWithData(
                   res,
@@ -425,30 +460,30 @@ exports.OrderUpdateStatus = [
           );
         }
       }
-    } catch (err) {
+    } catch ( err ) {
       //throw error in json response with status 500.
-      return apiResponse.ErrorResponse(res, err);
+      return apiResponse.ErrorResponse( res, err );
     }
   },
 ];
 
-const getUserData = async (user) => {
-  return new Promise((resolve, reject) => {
-    UserModel.findById(user)
-      .then((user) => resolve(user))
-      .catch((err) => reject(user));
-  });
+const getUserData = async ( user ) => {
+  return new Promise( ( resolve, reject ) => {
+    UserModel.findById( user )
+      .then( ( user ) => resolve( user ) )
+      .catch( ( err ) => reject( user ) );
+  } );
 };
 
 exports.VerifyToken = [
-  body("AccessCode", "AccessCode is required")
+  body( "AccessCode", "AccessCode is required" )
     .exists()
-    .isLength({ min: 10 })
-    .withMessage("AccessCode cannot be empty"),
-  (req, res) => {
+    .isLength( { min: 10 } )
+    .withMessage( "AccessCode cannot be empty" ),
+  ( req, res ) => {
     try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
+      const errors = validationResult( req );
+      if ( !errors.isEmpty() ) {
         // Display sanitized values/errors messages.
         return apiResponse.validationErrorWithData(
           res,
@@ -457,47 +492,47 @@ exports.VerifyToken = [
         );
       } else {
         eway
-          .getAccessCode(req.body.AccessCode)
-          .then(function (response) {
-            if (response.get("Transactions[0].TransactionStatus")) {
+          .getAccessCode( req.body.AccessCode )
+          .then( function ( response ) {
+            if ( response.get( "Transactions[0].TransactionStatus" ) ) {
               OrderModel.findById(
-                response.get("Transactions[0].InvoiceNumber"),
-                async (err, data) => {
-                  let userData = await getUserData(data.user);
+                response.get( "Transactions[0].InvoiceNumber" ),
+                async ( err, data ) => {
+                  let userData = await getUserData( data.user );
                   let user = data.user;
-                  if (!!userData && !!userData.first_name) {
+                  if ( !!userData && !!userData.first_name ) {
                     user = userData.first_name + " " + userData.last_name;
                   }
-                  if (!err) {
+                  if ( !err ) {
                     OrderModel.updateOne(
-                      { _id: response.get("Transactions[0].InvoiceNumber") },
+                      { _id: response.get( "Transactions[0].InvoiceNumber" ) },
                       { payment: 1 },
-                      function (err, data) {}
+                      function ( err, data ) { }
                     );
-                    if (data.total_amount >= 100) {
-                      let redeem = Math.ceil(data.total_amount / 100);
-                      let redeemData = new RedeemModel({
+                    if ( data.total_amount >= 100 ) {
+                      let redeem = Math.ceil( data.total_amount / 100 );
+                      let redeemData = new RedeemModel( {
                         date: data.order_date,
                         user: data.user,
                         order_id: data._id,
                         total_amount: data.total_amount,
                         redeem_points: redeem,
-                      });
-                      redeemData.save((err, msg) => {});
+                      } );
+                      redeemData.save( ( err, msg ) => { } );
                     }
-                    if (data.redeempoints_used > 0) {
-                      let redeemDataUsed = new RedeemModel({
+                    if ( data.redeempoints_used > 0 ) {
+                      let redeemDataUsed = new RedeemModel( {
                         date: data.order_date,
                         user: data.user,
                         order_id: data._id,
                         total_amount: data.total_amount,
                         redeem_points: data.redeempoints_used,
                         status: 2,
-                      });
-                      redeemDataUsed.save((err, msg) => {});
+                      } );
+                      redeemDataUsed.save( ( err, msg ) => { } );
                     }
-                    data.items.map((it) => {
-                      let stock = new StockMoveModel({
+                    data.items.map( ( it ) => {
+                      let stock = new StockMoveModel( {
                         date: data.order_date,
                         user: data.user,
                         order_id: data._id,
@@ -505,9 +540,9 @@ exports.VerifyToken = [
                         quantity: it.quantity,
                         status: 1,
                         transactionType: "By Order",
-                      });
-                      stock.save((err, msg) => {});
-                    });
+                      } );
+                      stock.save( ( err, msg ) => { } );
+                    } );
                     let html = `<html lang="en">
 
                       <head>
@@ -545,10 +580,10 @@ exports.VerifyToken = [
                           </tr>
                       </thead>
                       <tbody>`;
-                    let orders = data.items.map((it, i) => {
+                    let orders = data.items.map( ( it, i ) => {
                       return (
                         "<tr><td>" +
-                        parseInt(i + 1) +
+                        parseInt( i + 1 ) +
                         "</td><td>" +
                         it.item_name +
                         "</td><td style='align-items:center'>" +
@@ -557,8 +592,8 @@ exports.VerifyToken = [
                         it.price +
                         "</td></tr>"
                       );
-                    });
-                    html = html + orders.join("");
+                    } );
+                    html = html + orders.join( "" );
                     html =
                       html +
                       `</tbody>
@@ -584,7 +619,7 @@ exports.VerifyToken = [
                     let customerPhone = response.get(
                       "Transactions[0].Customer"
                     );
-                    if (!!customerPhone.Phone) {
+                    if ( !!customerPhone.Phone ) {
                       twilio
                         .create(
                           customerPhone.Phone,
@@ -592,8 +627,8 @@ exports.VerifyToken = [
                             "Transactions[0].InvoiceNumber"
                           )} has been placed successfully on ${new Date().toLocaleString()} \n -Birlamart Team`
                         )
-                        .then((tres) => console.log(tres.sid))
-                        .catch((err) => console.log(err));
+                        .then( ( tres ) => console.log( tres.sid ) )
+                        .catch( ( err ) => console.log( err ) );
                     }
                     mailer
                       .send(
@@ -602,7 +637,7 @@ exports.VerifyToken = [
                         "Your Order on Birlamart",
                         html
                       )
-                      .then(function () {
+                      .then( function () {
                         return apiResponse.successResponseWithData(
                           res,
                           "Payment Success",
@@ -638,8 +673,8 @@ exports.VerifyToken = [
                             },
                           }
                         );
-                      })
-                      .catch((err) => {
+                      } )
+                      .catch( ( err ) => {
                         return apiResponse.successResponseWithData(
                           res,
                           "Payment Success",
@@ -675,26 +710,26 @@ exports.VerifyToken = [
                             },
                           }
                         );
-                      });
+                      } );
                   } else {
-                    return apiResponse.ErrorResponse(res, "Error occured");
+                    return apiResponse.ErrorResponse( res, "Error occured" );
                   }
                 }
               );
             } else {
               var errorCodes = response
-                .get("Transactions[0].ResponseMessage")
-                .split(", ");
-              return apiResponse.ErrorResponse(res, errorCodes);
+                .get( "Transactions[0].ResponseMessage" )
+                .split( ", " );
+              return apiResponse.ErrorResponse( res, errorCodes );
             }
-          })
-          .catch(function (reason) {
-            return apiResponse.ErrorResponse(res, "Payment Failed");
-          });
+          } )
+          .catch( function ( reason ) {
+            return apiResponse.ErrorResponse( res, "Payment Failed" );
+          } );
       }
-    } catch (err) {
+    } catch ( err ) {
       //throw error in json response with status 500.
-      return apiResponse.ErrorResponse(res, err);
+      return apiResponse.ErrorResponse( res, err );
     }
   },
 ];
